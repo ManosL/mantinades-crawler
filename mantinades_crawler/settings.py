@@ -68,6 +68,10 @@ DOWNLOADER_MIDDLEWARES = {
 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
 }
 
+LOG_ENABLED = True
+LOG_LEVEL = 'DEBUG'  # Or 'DEBUG' if you want very detailed logs
+LOG_FILE = '/spider.log'
+
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
