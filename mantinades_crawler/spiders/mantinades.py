@@ -3,7 +3,7 @@ import csv
 import os
 import re
 import scrapy
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
 
 
@@ -84,7 +84,9 @@ class MantinadesSpider(scrapy.Spider):
     # These are the urls that we will start scraping
     def start_requests(self):
         start_url = 'https://mantinades.gr/'
-        yield scrapy.Request(url=get_proxy_url(start_url), callback=self.parse)
+        yield scrapy.Request(url=start_url, callback=self.parse,
+                             meta={'root_url': start_url,
+                                   'proxy': 'http://62.210.215.36:80'})
 
 
 
@@ -98,10 +100,14 @@ class MantinadesSpider(scrapy.Spider):
 
         categories_refs = [c.get() for c in categories_refs][:-1]
 
-        redirect_urls = [f'{response.urljoin(c_ref)}?page=1' for c_ref in categories_refs]
+        response_url = response.meta.get('root_url')
+
+        redirect_urls = [f'{urljoin(response_url, c_ref)}?page=1' for c_ref in categories_refs]
 
         for url in redirect_urls:
-            yield scrapy.Request(get_proxy_url(url), callback=self.parse_category)
+            yield scrapy.Request(url, callback=self.parse_category,
+                                 meta={'root_url': url,
+                                       'proxy': 'http://62.210.215.36:80'})
 
 
 
@@ -140,7 +146,9 @@ class MantinadesSpider(scrapy.Spider):
             yield curr_item
 
         if curr_page < max_page:
-            next_url = re.sub(f'page=\d+$', f'page={curr_page + 1}', response.url)
-            yield scrapy.Request(next_url, callback=self.parse_category)
+            next_url = re.sub(f'page=\d+$', f'page={curr_page + 1}', response.meta.get('root_url'))
+            yield scrapy.Request(next_url, callback=self.parse_category,
+                                 meta={'root_url': next_url,
+                                       'proxy': 'http://62.210.215.36:80'})
 
         return
