@@ -141,6 +141,6 @@ class MantinadesSpider(scrapy.Spider):
 
         if curr_page < max_page:
             next_url = re.sub(f'page=\d+$', f'page={curr_page + 1}', response.url)
-            yield scrapy.Request(get_proxy_url(next_url), callback=self.parse_category)
+            yield scrapy.Request(next_url, callback=self.parse_category)
 
         return
