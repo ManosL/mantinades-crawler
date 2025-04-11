@@ -3,6 +3,7 @@ import csv
 import os
 import re
 import scrapy
+from urllib.parse import urlencode
 
 
 
@@ -11,10 +12,19 @@ DESTINATION_DIR = './data'
 # TODO: MAKE IT INCREMENTAL
 # LAST_RUN_DATE = '25/01/2025'
 
+API_KEY = '93479043-3b74-478c-882d-fb7016872bcf'
+
+def get_proxy_url(url):
+    payload = {'api_key': API_KEY, 'url': url}
+    proxy_url = 'https://proxy.scrapeops.io/v1/?' + urlencode(payload)
+    return proxy_url
+
+
+
 class MantinadesSpider(scrapy.Spider):
     name = 'mantinades'
     allowed_domains = ['mantinades.gr']
-    start_urls = ['https://mantinades.gr/']
+    # start_urls = ['https://mantinades.gr/']
 
     def __get_curr_page_and_max_page(self, response):
         curr_page = 1
@@ -71,6 +81,14 @@ class MantinadesSpider(scrapy.Spider):
 
 
 
+    # These are the urls that we will start scraping
+    def start_requests(self):
+        start_url = 'https://mantinades.gr/'
+        yield scrapy.Request(url=get_proxy_url(start_url), callback=self.parse)
+
+
+
+
     def parse(self, response):
         if not os.path.isdir(DESTINATION_DIR):
             os.mkdir(DESTINATION_DIR)
@@ -83,7 +101,7 @@ class MantinadesSpider(scrapy.Spider):
         redirect_urls = [f'{response.urljoin(c_ref)}?page=1' for c_ref in categories_refs]
 
         for url in redirect_urls:
-            yield scrapy.Request(url, callback=self.parse_category)
+            yield scrapy.Request(get_proxy_url(url), callback=self.parse_category)
 
 
 
@@ -123,6 +141,6 @@ class MantinadesSpider(scrapy.Spider):
 
         if curr_page < max_page:
             next_url = re.sub(f'page=\d+$', f'page={curr_page + 1}', response.url)
-            yield scrapy.Request(next_url, callback=self.parse_category)
+            yield scrapy.Request(get_proxy_url(next_url), callback=self.parse_category)
 
         return

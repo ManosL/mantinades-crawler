@@ -12,3 +12,4 @@ scrapeops-scrapy
 scrapy
 scrapy-fake-useragent
 BeautifulSoup4
+urllib3
