@@ -23,7 +23,7 @@ def get_proxy_url(url):
 
 class MantinadesSpider(scrapy.Spider):
     name = 'mantinades'
-    allowed_domains = ['mantinades.gr']
+    # allowed_domains = ['mantinades.gr']
     # start_urls = ['https://mantinades.gr/']
 
     def __get_curr_page_and_max_page(self, response):
