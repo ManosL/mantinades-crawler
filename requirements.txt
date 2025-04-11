@@ -1,0 +1,14 @@
+# Do not include azure-functions-worker in this file
+# The Python Worker is managed by the Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+pyyaml
+azure-functions
+azure-core
+azure-identity
+azure-storage-blob
+crochet
+scrapeops-scrapy
+scrapy
+scrapy-fake-useragent
+BeautifulSoup4
