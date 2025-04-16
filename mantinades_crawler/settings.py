@@ -23,7 +23,7 @@ ROBOTSTXT_OBEY = False # NOTE: Purely for the purposes of this project
 USER_AGENT = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -56,16 +56,16 @@ DOWNLOAD_DELAY = 0
 
 SCRAPEOPS_API_KEY = '93479043-3b74-478c-882d-fb7016872bcf'
 
-# Add In The ScrapeOps Extension
+# # Add In The ScrapeOps Extension
 EXTENSIONS = {
-'scrapeops_scrapy.extension.ScrapeOpsMonitor': 500,
+   'scrapeops_scrapy.extension.ScrapeOpsMonitor': 500,
 }
 
 
 # Update The Download Middlewares
 DOWNLOADER_MIDDLEWARES = {
-'scrapeops_scrapy.middleware.retry.RetryMiddleware': 550,
-'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+   'scrapeops_scrapy.middleware.retry.RetryMiddleware': 550,
+   'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
 }
 
 # LOG_ENABLED = True

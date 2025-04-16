@@ -38,7 +38,7 @@ class RemoveDuplicatesPipeline:
 
 class MantinadesCrawlerPipeline:
     def open_spider(self, spider):
-        sas_token = 'sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2025-04-11T22:33:41Z&st=2025-04-11T14:33:41Z&spr=https,http&sig=Hc1PyCgUBr1GLbbCmCdZCJPSyVm%2F3z8ncUdKsudFPmw%3D'
+        sas_token = 'sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2025-04-20T14:18:12Z&st=2025-04-16T06:18:12Z&spr=https&sig=TITwJh%2F%2BBDeU3KGmd5OMtXttNlKrSOn81t3CEeTrXGE%3D'
         account_url = f"https://mantinadescrawleraccount.blob.core.windows.net/?{sas_token}"
         # default_credential = DefaultAzureCredential()
 

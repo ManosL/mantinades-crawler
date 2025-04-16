@@ -16,7 +16,7 @@ API_KEY = '93479043-3b74-478c-882d-fb7016872bcf'
 
 def get_proxy_url(url):
     payload = {'api_key': API_KEY, 'url': url}
-    proxy_url = 'https://proxy.scrapeops.io/v1/?' + urlencode(payload)
+    proxy_url = 'https://api.scraperapi.com/' + urlencode(payload)
     return proxy_url
 
 
@@ -85,8 +85,7 @@ class MantinadesSpider(scrapy.Spider):
     def start_requests(self):
         start_url = 'https://mantinades.gr/'
         yield scrapy.Request(url=start_url, callback=self.parse,
-                             meta={'root_url': start_url,
-                                   'proxy': 'http://62.210.215.36:80'})
+                             meta={'root_url': start_url})
 
 
 
@@ -106,8 +105,7 @@ class MantinadesSpider(scrapy.Spider):
 
         for url in redirect_urls:
             yield scrapy.Request(url, callback=self.parse_category,
-                                 meta={'root_url': url,
-                                       'proxy': 'http://62.210.215.36:80'})
+                                 meta={'root_url': url})
 
 
 
@@ -148,7 +146,6 @@ class MantinadesSpider(scrapy.Spider):
         if curr_page < max_page:
             next_url = re.sub(f'page=\d+$', f'page={curr_page + 1}', response.meta.get('root_url'))
             yield scrapy.Request(next_url, callback=self.parse_category,
-                                 meta={'root_url': next_url,
-                                       'proxy': 'http://62.210.215.36:80'})
+                                 meta={'root_url': next_url})
 
         return
