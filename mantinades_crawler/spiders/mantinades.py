@@ -15,7 +15,7 @@ DESTINATION_DIR = './data'
 API_KEY = 'e0b9a5cba3d5e32766a578bc0c1e7c99'
 
 def get_proxy_url(url):
-    payload = {'api_key': API_KEY, 'url': url}
+    payload = {'api_key': API_KEY, 'url': url, 'country_code': 'eu'}
     proxy_url = 'https://api.scraperapi.com/?' + urlencode(payload)
     return proxy_url
 
@@ -110,7 +110,7 @@ class MantinadesSpider(scrapy.Spider):
 
 
     def parse_category(self, response):
-        category = response.url.split('/')[-1].split('?')[0]
+        category = response.meta.get('root_url').split('/')[-1].split('?')[0]
 
         curr_page, max_page = self.__get_curr_page_and_max_page(response)
 
