@@ -12,11 +12,11 @@ DESTINATION_DIR = './data'
 # TODO: MAKE IT INCREMENTAL
 # LAST_RUN_DATE = '25/01/2025'
 
-API_KEY = '93479043-3b74-478c-882d-fb7016872bcf'
+API_KEY = 'e0b9a5cba3d5e32766a578bc0c1e7c99'
 
 def get_proxy_url(url):
     payload = {'api_key': API_KEY, 'url': url}
-    proxy_url = 'https://api.scraperapi.com/' + urlencode(payload)
+    proxy_url = 'https://api.scraperapi.com/?' + urlencode(payload)
     return proxy_url
 
 
@@ -83,8 +83,8 @@ class MantinadesSpider(scrapy.Spider):
 
     # These are the urls that we will start scraping
     def start_requests(self):
-        start_url = 'https://mantinades.gr/'
-        yield scrapy.Request(url=start_url, callback=self.parse,
+        start_url = 'https://www.mantinades.gr/'
+        yield scrapy.Request(url=get_proxy_url(start_url), callback=self.parse,
                              meta={'root_url': start_url})
 
 
@@ -104,7 +104,7 @@ class MantinadesSpider(scrapy.Spider):
         redirect_urls = [f'{urljoin(response_url, c_ref)}?page=1' for c_ref in categories_refs]
 
         for url in redirect_urls:
-            yield scrapy.Request(url, callback=self.parse_category,
+            yield scrapy.Request(get_proxy_url(url), callback=self.parse_category,
                                  meta={'root_url': url})
 
 
@@ -145,7 +145,7 @@ class MantinadesSpider(scrapy.Spider):
 
         if curr_page < max_page:
             next_url = re.sub(f'page=\d+$', f'page={curr_page + 1}', response.meta.get('root_url'))
-            yield scrapy.Request(next_url, callback=self.parse_category,
+            yield scrapy.Request(get_proxy_url(next_url), callback=self.parse_category,
                                  meta={'root_url': next_url})
 
         return
