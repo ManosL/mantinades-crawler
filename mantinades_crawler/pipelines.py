@@ -62,7 +62,7 @@ class MantinadesCrawlerPipeline:
         item_category = item['category']
 
         if item_category not in self.categories_files.keys():
-            category_file = open(os.path.join(DESTINATION_DIR, f'{item_category}.csv'), 'w')
+            category_file = open(os.path.join(DESTINATION_DIR, f'{item_category}.csv'), 'w', encoding="utf-8")
             category_writer = csv.writer(category_file, delimiter='|')
 
             category_writer.writerow(self.header_row)
