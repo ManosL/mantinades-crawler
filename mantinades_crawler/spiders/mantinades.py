@@ -203,8 +203,8 @@ class MantinadesSpider(scrapy.Spider):
         
         crawling_info = {
             'reason':                   reason,
-            'start_time':               self.start_time,
-            'end_time':                 datetime.now(timezone.utc), 
+            'start_time':               str(self.start_time),
+            'end_time':                 str(datetime.now(timezone.utc)), 
             'all_topics_num':           all_topics_num,
             'parsed_topics_num':        parsed_topics_num,
             'not_parsed_topics':        not_parsed_topics,
