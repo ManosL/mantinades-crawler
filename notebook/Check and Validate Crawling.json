@@ -1,0 +1,158 @@
+{
+	"name": "Check and Validate Crawling",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "SparkPoolManos",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 1,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "1",
+				"spark.dynamicAllocation.maxExecutors": "1",
+				"spark.autotune.trackingId": "6716988b-4aa2-4e03-bdc7-b274c98afbc7"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1"
+			},
+			"enableDebugMode": false,
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/5521848d-954c-480a-9e4b-879a55f9ff16/resourceGroups/MantinadesCrawlerRG/providers/Microsoft.Synapse/workspaces/mantinades-crawler-workspace/bigDataPools/SparkPoolManos",
+				"name": "SparkPoolManos",
+				"type": "Spark",
+				"endpoint": "https://mantinades-crawler-workspace.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPoolManos",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from datetime import datetime, timezone\n",
+					"import math\n",
+					"import json\n",
+					"import numpy as np\n",
+					"import pandas as p\n",
+					"import json\n",
+					"from io import BytesIO, StringIO\n",
+					"\n",
+					"from azure.storage.blob import BlobServiceClient\n",
+					"from azure.core.exceptions import ResourceExistsError\n",
+					"from notebookutils import mssparkutils\n",
+					"\n",
+					"import pandas as pd\n",
+					"from azure.storage.blob import BlobServiceClient\n",
+					"\n",
+					"# Get storage key from Azure Key Vault\n",
+					"storage_key = json.loads(mssparkutils.credentials.getPropertiesAll(\"mantinadescrawleraccount\"))['AuthKey']\n",
+					"\n",
+					"account_url = \"https://mantinadescrawleraccount.blob.core.windows.net\"\n",
+					"\n",
+					"# Create the BlobServiceClient object\n",
+					"blob_service_client = BlobServiceClient(account_url, credential=storage_key)\n",
+					"\n",
+					"CRAWLED_DATA_CONTAINER   = 'data'\n",
+					"CRAWLING_INFO_FILENAME   = 'crawling_info.json'\n",
+					"\n",
+					"container_client = blob_service_client.get_container_client(CRAWLED_DATA_CONTAINER)\n",
+					"blob_client = container_client.get_blob_client(CRAWLING_INFO_FILENAME)\n",
+					"streamdownloader = blob_client.download_blob()\n",
+					"\n",
+					"crawling_info = json.loads(streamdownloader.readall())\n",
+					"\n",
+					"crawling_info"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Check also the time that ended the crawling\n",
+					"# Because crawler and this script will run once \n",
+					"# in a specific day we just want to see that \n",
+					"# the finish date is today so to verify that \n",
+					"# the crawler has retrieved the latest data\n",
+					"# However, check how can i do it better\n",
+					"\n",
+					"crawling_end_date = datetime.fromisoformat(crawling_info['end_time']).date()\n",
+					"today = datetime.now(timezone.utc).date()\n",
+					"\n",
+					"if crawling_end_date != today:\n",
+					"    error_msg = 'Seems that today\\'s crawling did not finish. Check crawler\\'s ' \\\n",
+					"                'logs and trigger the pipeline again when finishes'\n",
+					"    print(error_msg)\n",
+					"    raise Exception(error_msg)"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"if crawling_info['reason'] != 'finished':\n",
+					"    error_msg = 'Crawling did not finished gracefully. Please check the logs.'\n",
+					"    print(error_msg)\n",
+					"    raise Exception(error_msg)"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"if crawling_info['all_topics_num'] != crawling_info['parsed_topics_num']:\n",
+					"    not_parsed_topics = crawling_info['not_parsed_topics']\n",
+					"\n",
+					"    error_msg = f'Crawling did not parsed the following list of topics: {not_parsed_topics}'\n",
+					"    print(error_msg)\n",
+					"    raise Exception(error_msg)"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"crawling_info_per_topic = crawling_info['per_topic_information']\n",
+					"\n",
+					"error_msg = ''\n",
+					"\n",
+					"for c_info in crawling_info_per_topic:\n",
+					"    topic            = c_info['topic']\n",
+					"    pages_num        = c_info['pages_num']\n",
+					"    parsed_pages_num = c_info['parsed_pages_num']\n",
+					"\n",
+					"    if parsed_pages_num != pages_num:\n",
+					"        not_parsed_pages = c_info['not_parsed_pages']\n",
+					"\n",
+					"        error_msg += f'Crawling \"{topic}\" topic did not parsed the following pages: {not_parsed_pages}\\n'\n",
+					"    \n",
+					"if error_msg != '':\n",
+					"    raise Exception(error_msg)"
+				],
+				"execution_count": 12
+			}
+		]
+	}
+}

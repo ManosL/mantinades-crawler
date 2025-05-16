@@ -1,0 +1,30 @@
+{
+	"name": "DIM_Topic_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "mantinadescrawleraccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "DIM_Topic.parquet",
+				"container": "processed-data"
+			},
+			"compressionCodec": "none"
+		},
+		"schema": [
+			{
+				"name": "Key",
+				"type": "INT64"
+			},
+			{
+				"name": "Name",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

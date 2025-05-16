@@ -1,0 +1,27 @@
+{
+	"name": "DIM_Author_1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MantinadesDW",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "DIM Author Key",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Author Name",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DIM Author"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

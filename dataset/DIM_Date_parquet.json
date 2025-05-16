@@ -1,0 +1,90 @@
+{
+	"name": "DIM_Date_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "mantinadescrawleraccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "DIM_Date.parquet",
+				"container": "processed-data"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Key",
+				"type": "UTF8"
+			},
+			{
+				"name": "Date_Full",
+				"type": "UTF8"
+			},
+			{
+				"name": "Day",
+				"type": "INT64"
+			},
+			{
+				"name": "Day_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Month",
+				"type": "INT64"
+			},
+			{
+				"name": "Month_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Year",
+				"type": "INT64"
+			},
+			{
+				"name": "Day_of_Year",
+				"type": "INT64"
+			},
+			{
+				"name": "Day_of_Week",
+				"type": "INT64"
+			},
+			{
+				"name": "Quarter",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Month_Start",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Month_End",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Quarter_Start",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Quarter_End",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Year_Start",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Year_End",
+				"type": "INT64"
+			},
+			{
+				"name": "Is_Leap_Year",
+				"type": "INT64"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

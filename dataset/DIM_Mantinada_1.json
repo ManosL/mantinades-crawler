@@ -1,0 +1,32 @@
+{
+	"name": "DIM_Mantinada_1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MantinadesDW",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "DIM Mantinada Key",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Mantinada ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Mantinada Content",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DIM Mantinada"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
