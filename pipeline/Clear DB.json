@@ -1,5 +1,5 @@
 {
-	"name": "Clear DB UNTIL I MAKE IT INCREMENTAL",
+	"name": "Clear DB",
 	"properties": {
 		"activities": [
 			{

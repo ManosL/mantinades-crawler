@@ -32,7 +32,13 @@
 						"type": "BigDataPoolReference"
 					},
 					"executorSize": "Small",
-					"driverSize": "Small"
+					"conf": {
+						"spark.dynamicAllocation.enabled": null,
+						"spark.dynamicAllocation.minExecutors": null,
+						"spark.dynamicAllocation.maxExecutors": null
+					},
+					"driverSize": "Small",
+					"numExecutors": null
 				}
 			},
 			{
@@ -58,7 +64,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Clear DB UNTIL I MAKE IT INCREMENTAL",
+						"referenceName": "Clear DB",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
