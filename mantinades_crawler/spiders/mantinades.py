@@ -1,3 +1,4 @@
+# Databricks notebook source
 from bs4 import BeautifulSoup
 import csv
 from datetime import datetime, timezone
@@ -43,11 +44,11 @@ class MantinadesSpider(scrapy.Spider):
             return 1, 1
 
         curr_page_nums_text = curr_page_nums_text.strip()
-
+        
         pages_nums = re.match(r'^Σελίδα\s+(\d+)\s+από\s+(\d+)$', curr_page_nums_text)
 
         curr_page, max_page = int(pages_nums.group(1)), int(pages_nums.group(2))
-
+        print('MANOS ', curr_page_nums_text, 'EXTRACTED', curr_page, max_page, 'FROM', response.meta.get('root_url'))
         assert(curr_page <= max_page and curr_page >= 1)
 
         return curr_page, max_page
