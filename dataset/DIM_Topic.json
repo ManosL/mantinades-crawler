@@ -1,0 +1,27 @@
+{
+	"name": "DIM_Topic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MantinadesDW",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "DIM Topic Key",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Topic Name",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DIM Topic"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

@@ -1,0 +1,42 @@
+{
+	"name": "FACT_Mantinada_Entry_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "mantinadescrawleraccount",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "FACT_Mantinada_Entry.parquet",
+				"container": "processed-data"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Key",
+				"type": "INT64"
+			},
+			{
+				"name": "DIM_Topic_Key",
+				"type": "INT64"
+			},
+			{
+				"name": "DIM_Author_Key",
+				"type": "INT64"
+			},
+			{
+				"name": "DIM_Date_Key",
+				"type": "UTF8"
+			},
+			{
+				"name": "DIM_Mantinada_Key",
+				"type": "INT64"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

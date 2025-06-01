@@ -1,0 +1,17 @@
+{
+	"name": "DIM_Date_1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MantinadesDW",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DIM Date"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

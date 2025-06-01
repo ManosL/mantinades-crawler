@@ -1,0 +1,138 @@
+{
+	"name": "Clear DB",
+	"properties": {
+		"activities": [
+			{
+				"name": "Clear DIM Topic",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Clear FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Clear_DIM_Topic]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Clear DIM Author",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Clear FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Clear_DIM_Author]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Clear DIM Date",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Clear FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Clear_DIM_Date]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Clear DIM Mantinada",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Clear FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Clear_DIM_Mantinada]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Clear FACT Mantinada Entry",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Clear_FACT_Mantinada_Entry]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-04-28T19:51:16Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

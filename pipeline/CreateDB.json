@@ -1,0 +1,135 @@
+{
+	"name": "CreateDB",
+	"properties": {
+		"activities": [
+			{
+				"name": "Create DIM Topic",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Create_DIM_Topic]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create DIM Author",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Create_DIM_Author]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create DIM Date",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Create_DIM_Date]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create DIM Mantinada",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Create_DIM_Mantinada]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create FACT Mantinada Entry",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Create DIM Author",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Create DIM Topic",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Create DIM Date",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Create DIM Mantinada",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Create_FACT_Mantinada_Entry]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-03-23T12:25:09Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

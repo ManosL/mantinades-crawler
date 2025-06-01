@@ -1,0 +1,42 @@
+{
+	"name": "FACT_Mantinada_Entry_1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MantinadesDW",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FACT Mantinada Entry Key",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Topic Key",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Author Key",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DIM Date Key",
+				"type": "varchar"
+			},
+			{
+				"name": "DIM Mantinada Key",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "FACT Mantinada Entry"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

@@ -1,0 +1,138 @@
+{
+	"name": "Drop DB Tables",
+	"properties": {
+		"activities": [
+			{
+				"name": "Drop DIM Topic",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Drop FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Drop_DIM_Topic]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Drop DIM Author",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Drop FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Drop_DIM_Author]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Drop DIM Date",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Drop FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Drop_DIM_Date]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Drop DIM Mantinada",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Drop FACT Mantinada Entry",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Drop_DIM_Mantinada]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Drop FACT Mantinada Entry",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Drop_FACT_Mantinada_Entry]"
+				},
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-03-24T15:00:19Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}
