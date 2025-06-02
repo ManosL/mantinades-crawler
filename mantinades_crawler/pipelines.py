@@ -38,8 +38,8 @@ class RemoveDuplicatesPipeline:
 
 class MantinadesCrawlerPipeline:
     def open_spider(self, spider):
-        sas_token = 'sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2025-06-28T16:31:23Z&st=2025-04-28T08:31:23Z&spr=https&sig=T%2BrccqmnwUA3sqiv9DVwJ5wEFHdgk9hjOSvhUB1PDCs%3D'
-        account_url = f"https://mantinadescrawleraccount.blob.core.windows.net/?{sas_token}"
+        sas_token = os.environ['AZURE_BLOB_STORAGE_SAS_TOKEN']
+        account_url = f"https://{os.environ['AZURE_BLOB_STORAGE_ACCOUNT_NAME']}.blob.core.windows.net/?{sas_token}"
         # default_credential = DefaultAzureCredential()
 
         # Create the BlobServiceClient object

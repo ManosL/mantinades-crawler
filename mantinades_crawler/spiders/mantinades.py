@@ -14,12 +14,12 @@ from azure.core.exceptions import ResourceExistsError
 
 
 
-DESTINATION_DIR = './data'
+DESTINATION_DIR = os.environ['DESTINATION_DIR']
 
 # TODO: MAKE IT INCREMENTAL
 # LAST_RUN_DATE = '25/01/2025'
 
-API_KEY = 'e0b9a5cba3d5e32766a578bc0c1e7c99'
+API_KEY = os.environ['SCRAPER_PROXY_API_KEY']
 
 def get_proxy_url(url):
     payload = {'api_key': API_KEY, 'url': url, 'country_code': 'eu'}
@@ -48,7 +48,6 @@ class MantinadesSpider(scrapy.Spider):
         pages_nums = re.match(r'^Σελίδα\s+(\d+)\s+από\s+(\d+)$', curr_page_nums_text)
 
         curr_page, max_page = int(pages_nums.group(1)), int(pages_nums.group(2))
-        print('MANOS ', curr_page_nums_text, 'EXTRACTED', curr_page, max_page, 'FROM', response.meta.get('root_url'))
         assert(curr_page <= max_page and curr_page >= 1)
 
         return curr_page, max_page
@@ -212,8 +211,8 @@ class MantinadesSpider(scrapy.Spider):
             'per_topic_information':    per_topic_information 
         }
 
-        sas_token = 'sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2025-06-28T16:31:23Z&st=2025-04-28T08:31:23Z&spr=https&sig=T%2BrccqmnwUA3sqiv9DVwJ5wEFHdgk9hjOSvhUB1PDCs%3D'
-        account_url = f"https://mantinadescrawleraccount.blob.core.windows.net/?{sas_token}"
+        sas_token = os.environ['AZURE_BLOB_STORAGE_SAS_TOKEN']
+        account_url = f"https://{os.environ['AZURE_BLOB_STORAGE_ACCOUNT_NAME']}.blob.core.windows.net/?{sas_token}"
         # default_credential = DefaultAzureCredential()
 
         # Create the BlobServiceClient object

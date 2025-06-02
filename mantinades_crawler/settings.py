@@ -6,6 +6,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import os
 
 BOT_NAME = 'mantinades_crawler'
 
@@ -54,7 +55,7 @@ DOWNLOAD_DELAY = 2
 
 # Add Your ScrapeOps API key
 
-SCRAPEOPS_API_KEY = '93479043-3b74-478c-882d-fb7016872bcf'
+SCRAPEOPS_API_KEY = os.environ['SCRAPEOPS_API_KEY']
 
 # # Add In The ScrapeOps Extension
 EXTENSIONS = {
