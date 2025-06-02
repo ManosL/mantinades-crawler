@@ -12,14 +12,18 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from azure.core.exceptions import ResourceExistsError
 
+from scrapy.utils.project import get_project_settings
+
+settings = get_project_settings()
 
 
-DESTINATION_DIR = os.environ['DESTINATION_DIR']
+
+DESTINATION_DIR = settings.get('DESTINATION_DIR')
 
 # TODO: MAKE IT INCREMENTAL
 # LAST_RUN_DATE = '25/01/2025'
 
-API_KEY = os.environ['SCRAPER_PROXY_API_KEY']
+API_KEY = settings.get('SCRAPER_PROXY_API_KEY')
 
 def get_proxy_url(url):
     payload = {'api_key': API_KEY, 'url': url, 'country_code': 'eu'}
@@ -211,8 +215,8 @@ class MantinadesSpider(scrapy.Spider):
             'per_topic_information':    per_topic_information 
         }
 
-        sas_token = os.environ['AZURE_BLOB_STORAGE_SAS_TOKEN']
-        account_url = f"https://{os.environ['AZURE_BLOB_STORAGE_ACCOUNT_NAME']}.blob.core.windows.net/?{sas_token}"
+        sas_token = settings.get('AZURE_BLOB_STORAGE_SAS_TOKEN')
+        account_url = f"https://{settings.get('AZURE_BLOB_STORAGE_ACCOUNT_NAME')}.blob.core.windows.net/?{sas_token}"
         # default_credential = DefaultAzureCredential()
 
         # Create the BlobServiceClient object
