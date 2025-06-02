@@ -13,10 +13,6 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from azure.core.exceptions import ResourceExistsError
 
-from scrapy.utils.project import get_project_settings
-
-settings = get_project_settings()
-
 from mantinades_crawler.spiders.mantinades import DESTINATION_DIR
 
 
@@ -42,8 +38,8 @@ class RemoveDuplicatesPipeline:
 
 class MantinadesCrawlerPipeline:
     def open_spider(self, spider):
-        sas_token = settings.get('AZURE_BLOB_STORAGE_SAS_TOKEN')
-        account_url = f"https://{settings.get('AZURE_BLOB_STORAGE_ACCOUNT_NAME')}.blob.core.windows.net/?{sas_token}"
+        sas_token = os.environ['AZURE_BLOB_STORAGE_SAS_TOKEN']
+        account_url = f"https://{os.environ['AZURE_BLOB_STORAGE_ACCOUNT_NAME']}.blob.core.windows.net/?{sas_token}"
         # default_credential = DefaultAzureCredential()
 
         # Create the BlobServiceClient object

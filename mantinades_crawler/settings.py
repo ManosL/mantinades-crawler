@@ -6,10 +6,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-from scrapy.utils.project import get_project_settings
-
-settings = get_project_settings()
-
+import os
 
 BOT_NAME = 'mantinades_crawler'
 
@@ -58,7 +55,7 @@ DOWNLOAD_DELAY = 2
 
 # Add Your ScrapeOps API key
 
-SCRAPEOPS_API_KEY = settings.get('SCRAPEOPS_API_KEY')
+SCRAPEOPS_API_KEY = os.environ['SCRAPEOPS_API_KEY']
 
 # # Add In The ScrapeOps Extension
 EXTENSIONS = {
