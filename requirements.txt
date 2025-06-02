@@ -13,3 +13,4 @@ scrapy
 scrapy-fake-useragent
 BeautifulSoup4
 urllib3
+python-dotenv
