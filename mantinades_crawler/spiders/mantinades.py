@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 import csv
 from datetime import datetime, timezone
+from pprint import pformat
 import json
 import os
 import re
@@ -219,9 +220,19 @@ class MantinadesSpider(scrapy.Spider):
         self.blob_service_client = BlobServiceClient(account_url)
 
         # The container has already been created 
-        self.container_client = self.blob_service_client.get_container_client('data')
+        self.data_container_client = self.blob_service_client.get_container_client('data')
 
-        CRAWLING_INFO_FILE_NAME = 'crawling_info.json'
+        # Create the logs container
+        try:
+            self.logs_container_client = self.blob_service_client.create_container('logs')
+        except ResourceExistsError:
+            print('Container data already exists')
+            self.logs_container_client = self.blob_service_client.get_container_client('logs')
+
+        WRITE_TO_LOGS_TIME           = datetime.strftime(datetime.now(timezone.utc), '%Y%m%d_%H%M%S')
+        CRAWLING_INFO_FILE_NAME      = 'crawling_info.json'
+        CRAWLING_INFO_FILE_NAME_LOGS = f'crawling_info_{WRITE_TO_LOGS_TIME}.json'
+        SCRAPY_LOGS_FILE_NAME        = f'logs_{WRITE_TO_LOGS_TIME}.txt'
 
         # Write the file in a temporary place
         with open(CRAWLING_INFO_FILE_NAME, 'w', encoding='utf-8') as f:
@@ -229,7 +240,15 @@ class MantinadesSpider(scrapy.Spider):
 
         # Read it again and upload blob
         with open(CRAWLING_INFO_FILE_NAME, "rb") as data:
-            self.container_client.upload_blob(name=CRAWLING_INFO_FILE_NAME, data=data, overwrite=True)
+            self.data_container_client.upload_blob(name=CRAWLING_INFO_FILE_NAME,      data=data, overwrite=True)
+
+        with open(CRAWLING_INFO_FILE_NAME, "rb") as data:
+            self.logs_container_client.upload_blob(name=CRAWLING_INFO_FILE_NAME_LOGS, data=data, overwrite=True)
+
+        print(pformat(self.crawler.stats.get_stats()))
+        with open(self.settings['LOG_FILE'], 'rb') as data:
+            self.logs_container_client.upload_blob(name=SCRAPY_LOGS_FILE_NAME, data=data, overwrite=True)
 
         os.remove(CRAWLING_INFO_FILE_NAME)
+        # os.remove(self.settings['LOG_FILE'])
         return

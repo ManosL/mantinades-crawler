@@ -71,3 +71,4 @@ A snapshot of the report is shown below:
 - Additional data quality checks
 - NLP-based insights (e.g., keyword extraction, rhyme analysis)
 - Data enrichment (e.g., storing separately the 2 parts of mantinada, tagging sentiment or genre)
+- Instruction to replicate project locally(using Docker) and in the Cloud
