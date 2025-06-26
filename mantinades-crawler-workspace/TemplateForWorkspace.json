@@ -1,0 +1,2635 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "mantinades-crawler-workspace"
+		},
+		"Mantinades Crawling Function_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'Mantinades Crawling Function'"
+		},
+		"MantinadesDW_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'MantinadesDW'"
+		},
+		"mantinades-crawler-workspace-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'mantinades-crawler-workspace-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mantinades-crawler-workspace.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"mantinadescrawleraccount_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'mantinadescrawleraccount'"
+		},
+		"Mantinades Crawling Function_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "mantinades-scrapy-crawler.azurewebsites.net"
+		},
+		"mantinades-crawler-workspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://mantinadescrawleraccount.dfs.core.windows.net"
+		},
+		"Daily 8am Trigger_properties_MantinadesETL Wrapper_parameters_receiver": {
+			"type": "string",
+			"defaultValue": "https://prod-231.westeurope.logic.azure.com:443/workflows/a92e72ae2aee4a74af93d0beb2d731e9/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=0kqILKN-X7EeRs-qRgbcc1X_yPWUh4DHkWq7we4w9ls"
+		},
+		"Daily 8am Trigger_properties_MantinadesETL Wrapper_parameters_emailNotifierAppURL": {
+			"type": "string",
+			"defaultValue": "manolislykos97@hotmail.gr"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/Clear DB')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Clear DIM Topic",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Clear FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Clear_DIM_Topic]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Clear DIM Author",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Clear FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Clear_DIM_Author]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Clear DIM Date",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Clear FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Clear_DIM_Date]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Clear DIM Mantinada",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Clear FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Clear_DIM_Mantinada]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Clear FACT Mantinada Entry",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Clear_FACT_Mantinada_Entry]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-04-28T19:51:16Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateDB')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Create DIM Topic",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Create_DIM_Topic]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Create DIM Author",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Create_DIM_Author]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Create DIM Date",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Create_DIM_Date]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Create DIM Mantinada",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Create_DIM_Mantinada]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Create FACT Mantinada Entry",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Create DIM Author",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Create DIM Topic",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Create DIM Date",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Create DIM Mantinada",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Create_FACT_Mantinada_Entry]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-23T12:25:09Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Drop DB Tables')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Drop DIM Topic",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Drop FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Drop_DIM_Topic]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Drop DIM Author",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Drop FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Drop_DIM_Author]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Drop DIM Date",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Drop FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Drop_DIM_Date]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Drop DIM Mantinada",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Drop FACT Mantinada Entry",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Drop_DIM_Mantinada]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Drop FACT Mantinada Entry",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[dbo].[Drop_FACT_Mantinada_Entry]"
+						},
+						"linkedServiceName": {
+							"referenceName": "MantinadesDW",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-24T15:00:19Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MantinadesETL')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Process Crawled Data",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Validate Crawled Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "Process Crawled Data",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPoolManos",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						}
+					},
+					{
+						"name": "Clear DB",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Process Crawled Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "CreateDB",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Clear DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Populate DB",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Clear DB",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Populate DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "CreateDB",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Validate Crawled Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "CreateDB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Validate Crawled Data",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "Check and Validate Crawling",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "SparkPoolManos",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": false,
+								"spark.dynamicAllocation.minExecutors": 1,
+								"spark.dynamicAllocation.maxExecutors": 1
+							},
+							"driverSize": "Small",
+							"numExecutors": 1
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-04-28T19:11:09Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/Process Crawled Data')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/SparkPoolManos')]",
+				"[concat(variables('workspaceId'), '/pipelines/Clear DB')]",
+				"[concat(variables('workspaceId'), '/pipelines/Populate DB')]",
+				"[concat(variables('workspaceId'), '/pipelines/CreateDB')]",
+				"[concat(variables('workspaceId'), '/notebooks/Check and Validate Crawling')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Populate DB')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Populate DIM Topic",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Topic Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Topic Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DIM_Topic_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DIM_Topic",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Populate DIM Author",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Author Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Author Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DIM_Author_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DIM_Author_1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Populate DIM Date",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Key",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Date Key",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Date_Full",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Date Full",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Date_Full_US_Format",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Date Full US Format",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Day",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Date Day",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "Day_Name",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Date Day Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Month",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Date Month",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "Month_Name",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Date Month Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Year",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Date Year",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "Day_of_Year",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Date Day of Year",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "Day_of_Week",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Date Day of Week",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "Quarter",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Date Quarter",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Month_Start",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Month Start",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Month_End",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Month End",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Quarter_Start",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Quarter Start",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Quarter_End",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Quarter End",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Year_Start",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Year Start",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Year_End",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Year End",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "Is_Leap_Year",
+											"type": "Boolean",
+											"physicalType": "BOOLEAN"
+										},
+										"sink": {
+											"name": "DIM Date Is Leap Year",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DIM_Date_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DIM_Date_1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Populate DIM Mantinada",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Mantinada Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "ID",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Mantinada ID",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "Content",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Mantinada Content",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DIM_Mantinada_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DIM_Mantinada_1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Populate FACT Mantinada Entry",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Populate DIM Topic",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Populate DIM Author",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Populate DIM Date",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Populate DIM Mantinada",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "FACT Mantinada Entry Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "DIM_Topic_Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Topic Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "DIM_Author_Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Author Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "DIM_Date_Key",
+											"type": "String",
+											"physicalType": "UTF8"
+										},
+										"sink": {
+											"name": "DIM Date Key",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DIM_Mantinada_Key",
+											"type": "Int64",
+											"physicalType": "INT64"
+										},
+										"sink": {
+											"name": "DIM Mantinada Key",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "FACT_Mantinada_Entry_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "FACT_Mantinada_Entry_1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-05-05T10:38:46Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/DIM_Topic_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Topic')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Author_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Author_1')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Date_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Date_1')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Mantinada_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/DIM_Mantinada_1')]",
+				"[concat(variables('workspaceId'), '/datasets/FACT_Mantinada_Entry_parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/FACT_Mantinada_Entry_1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Author_1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DIM Author Key",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Author Name",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DIM Author"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Author_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mantinadescrawleraccount",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "DIM_Author.parquet",
+						"container": "processed-data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Key",
+						"type": "INT64"
+					},
+					{
+						"name": "Name",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mantinadescrawleraccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Date_1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DIM Date"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Date_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mantinadescrawleraccount",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "DIM_Date.parquet",
+						"container": "processed-data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Key",
+						"type": "UTF8"
+					},
+					{
+						"name": "Date_Full",
+						"type": "UTF8"
+					},
+					{
+						"name": "Day",
+						"type": "INT64"
+					},
+					{
+						"name": "Day_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Month",
+						"type": "INT64"
+					},
+					{
+						"name": "Month_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Year",
+						"type": "INT64"
+					},
+					{
+						"name": "Day_of_Year",
+						"type": "INT64"
+					},
+					{
+						"name": "Day_of_Week",
+						"type": "INT64"
+					},
+					{
+						"name": "Quarter",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Month_Start",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Month_End",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Quarter_Start",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Quarter_End",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Year_Start",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Year_End",
+						"type": "INT64"
+					},
+					{
+						"name": "Is_Leap_Year",
+						"type": "INT64"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mantinadescrawleraccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Mantinada_1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DIM Mantinada Key",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Mantinada ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Mantinada Content",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DIM Mantinada"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Mantinada_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mantinadescrawleraccount",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "DIM_Mantinada.parquet",
+						"container": "processed-data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Key",
+						"type": "INT64"
+					},
+					{
+						"name": "ID",
+						"type": "INT64"
+					},
+					{
+						"name": "Content",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mantinadescrawleraccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Topic')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DIM Topic Key",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Topic Name",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DIM Topic"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DIM_Topic_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mantinadescrawleraccount",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "DIM_Topic.parquet",
+						"container": "processed-data"
+					},
+					"compressionCodec": "none"
+				},
+				"schema": [
+					{
+						"name": "Key",
+						"type": "INT64"
+					},
+					{
+						"name": "Name",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mantinadescrawleraccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/FACT_Mantinada_Entry_1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MantinadesDW",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FACT Mantinada Entry Key",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Topic Key",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Author Key",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DIM Date Key",
+						"type": "varchar"
+					},
+					{
+						"name": "DIM Mantinada Key",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FACT Mantinada Entry"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/MantinadesDW')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/FACT_Mantinada_Entry_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "mantinadescrawleraccount",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "FACT_Mantinada_Entry.parquet",
+						"container": "processed-data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Key",
+						"type": "INT64"
+					},
+					{
+						"name": "DIM_Topic_Key",
+						"type": "INT64"
+					},
+					{
+						"name": "DIM_Author_Key",
+						"type": "INT64"
+					},
+					{
+						"name": "DIM_Date_Key",
+						"type": "UTF8"
+					},
+					{
+						"name": "DIM_Mantinada_Key",
+						"type": "INT64"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/mantinadescrawleraccount')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Mantinades Crawling Function')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('Mantinades Crawling Function_properties_typeProperties_functionAppUrl')]",
+					"authentication": "Anonymous",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('Mantinades Crawling Function_functionKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MantinadesDW')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('MantinadesDW_connectionString')]",
+					"alwaysEncryptedSettings": {
+						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mantinades-crawler-workspace-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('mantinades-crawler-workspace-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mantinades-crawler-workspace-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('mantinades-crawler-workspace-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mantinadescrawleraccount')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('mantinadescrawleraccount_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Daily 8am Trigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Weekly trigger every Monday",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "MantinadesETL Wrapper",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"receiver": "[parameters('Daily 8am Trigger_properties_MantinadesETL Wrapper_parameters_receiver')]",
+							"emailNotifierAppURL": "[parameters('Daily 8am Trigger_properties_MantinadesETL Wrapper_parameters_emailNotifierAppURL')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 7,
+						"startTime": "2025-05-05T07:00:00",
+						"timeZone": "GTB Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								8
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/MantinadesETL Wrapper')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Check and Validate Crawling')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "SparkPoolManos",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 1,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "6716988b-4aa2-4e03-bdc7-b274c98afbc7"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/5521848d-954c-480a-9e4b-879a55f9ff16/resourceGroups/MantinadesCrawlerRG/providers/Microsoft.Synapse/workspaces/mantinades-crawler-workspace/bigDataPools/SparkPoolManos",
+						"name": "SparkPoolManos",
+						"type": "Spark",
+						"endpoint": "https://mantinades-crawler-workspace.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPoolManos",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from datetime import datetime, timezone\n",
+							"import math\n",
+							"import json\n",
+							"import numpy as np\n",
+							"import pandas as p\n",
+							"import json\n",
+							"from io import BytesIO, StringIO\n",
+							"\n",
+							"from azure.storage.blob import BlobServiceClient\n",
+							"from azure.core.exceptions import ResourceExistsError\n",
+							"from notebookutils import mssparkutils\n",
+							"\n",
+							"import pandas as pd\n",
+							"from azure.storage.blob import BlobServiceClient\n",
+							"\n",
+							"# Get storage key from Azure Key Vault\n",
+							"storage_key = json.loads(mssparkutils.credentials.getPropertiesAll(\"mantinadescrawleraccount\"))['AuthKey']\n",
+							"\n",
+							"account_url = \"https://mantinadescrawleraccount.blob.core.windows.net\"\n",
+							"\n",
+							"# Create the BlobServiceClient object\n",
+							"blob_service_client = BlobServiceClient(account_url, credential=storage_key)\n",
+							"\n",
+							"CRAWLED_DATA_CONTAINER   = 'data'\n",
+							"CRAWLING_INFO_FILENAME   = 'crawling_info.json'\n",
+							"\n",
+							"container_client = blob_service_client.get_container_client(CRAWLED_DATA_CONTAINER)\n",
+							"blob_client = container_client.get_blob_client(CRAWLING_INFO_FILENAME)\n",
+							"streamdownloader = blob_client.download_blob()\n",
+							"\n",
+							"crawling_info = json.loads(streamdownloader.readall())\n",
+							"\n",
+							"crawling_info"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Check also the time that ended the crawling\n",
+							"# Because crawler and this script will run once \n",
+							"# in a specific day we just want to see that \n",
+							"# the finish date is today so to verify that \n",
+							"# the crawler has retrieved the latest data\n",
+							"# However, check how can i do it better\n",
+							"\n",
+							"crawling_end_date = datetime.fromisoformat(crawling_info['end_time']).date()\n",
+							"today = datetime.now(timezone.utc).date()\n",
+							"\n",
+							"if crawling_end_date != today:\n",
+							"    error_msg = 'Seems that today\\'s crawling did not finish. Check crawler\\'s ' \\\n",
+							"                'logs and trigger the pipeline again when finishes'\n",
+							"    print(error_msg)\n",
+							"    raise Exception(error_msg)"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"if crawling_info['reason'] != 'finished':\n",
+							"    error_msg = 'Crawling did not finished gracefully. Please check the logs.'\n",
+							"    print(error_msg)\n",
+							"    raise Exception(error_msg)"
+						],
+						"outputs": [],
+						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"if crawling_info['all_topics_num'] != crawling_info['parsed_topics_num']:\n",
+							"    not_parsed_topics = crawling_info['not_parsed_topics']\n",
+							"\n",
+							"    error_msg = f'Crawling did not parsed the following list of topics: {not_parsed_topics}'\n",
+							"    print(error_msg)\n",
+							"    raise Exception(error_msg)"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"crawling_info_per_topic = crawling_info['per_topic_information']\n",
+							"\n",
+							"error_msg = ''\n",
+							"\n",
+							"for c_info in crawling_info_per_topic:\n",
+							"    topic            = c_info['topic']\n",
+							"    pages_num        = c_info['pages_num']\n",
+							"    parsed_pages_num = c_info['parsed_pages_num']\n",
+							"\n",
+							"    if parsed_pages_num != pages_num:\n",
+							"        not_parsed_pages = c_info['not_parsed_pages']\n",
+							"\n",
+							"        error_msg += f'Crawling \"{topic}\" topic did not parsed the following pages: {not_parsed_pages}\\n'\n",
+							"    \n",
+							"if error_msg != '':\n",
+							"    raise Exception(error_msg)"
+						],
+						"outputs": [],
+						"execution_count": 12
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Process Crawled Data')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "SparkPoolManos",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "88341739-6d59-413d-ac52-2d26d220c1a2"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/5521848d-954c-480a-9e4b-879a55f9ff16/resourceGroups/MantinadesCrawlerRG/providers/Microsoft.Synapse/workspaces/mantinades-crawler-workspace/bigDataPools/SparkPoolManos",
+						"name": "SparkPoolManos",
+						"type": "Spark",
+						"endpoint": "https://mantinades-crawler-workspace.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPoolManos",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"# NOTE: Synapse does not support azure-identity\n",
+							"import ast\n",
+							"import os\n",
+							"import math\n",
+							"import json\n",
+							"import numpy as np\n",
+							"import pandas as p\n",
+							"from io import BytesIO, StringIO\n",
+							"\n",
+							"from azure.storage.blob import BlobServiceClient\n",
+							"from azure.core.exceptions import ResourceExistsError\n",
+							"from notebookutils import mssparkutils\n",
+							"\n",
+							"import pandas as pd\n",
+							"from azure.storage.blob import BlobServiceClient\n",
+							"\n",
+							"# Get storage key from Azure Key Vault\n",
+							"storage_key = json.loads(mssparkutils.credentials.getPropertiesAll(\"mantinadescrawleraccount\"))['AuthKey']\n",
+							"\n",
+							"\n",
+							"\n",
+							"def get_df_from_container_blob(container_client, blob_name):\n",
+							"    # Get blob client from container client\n",
+							"    blob_client = container_client.get_blob_client(blob_name)\n",
+							"\n",
+							"    # Download blob content\n",
+							"    stream = BytesIO(blob_client.download_blob().readall())\n",
+							"\n",
+							"    # Read CSV into DataFrame\n",
+							"    df = pd.read_csv(stream, sep='|', header=0)\n",
+							"\n",
+							"    return df\n",
+							"\n",
+							"\n",
+							"\n",
+							"def write_df_to_container_blob(df, container_client, blob_name):\n",
+							"    # Convert DataFrame to Parquet in memory\n",
+							"    parquet_buffer = BytesIO()\n",
+							"    df.to_parquet(parquet_buffer, index=False)\n",
+							"    parquet_buffer.seek(0)\n",
+							"\n",
+							"    blob_client = container_client.get_blob_client(blob_name)\n",
+							"    blob_client.upload_blob(parquet_buffer, overwrite=True)\n",
+							"\n",
+							"    return\n",
+							"\n",
+							"\n",
+							"account_url = \"https://mantinadescrawleraccount.blob.core.windows.net\"\n",
+							"\n",
+							"# Create the BlobServiceClient object\n",
+							"blob_service_client = BlobServiceClient(account_url, credential=storage_key)"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"CRAWLED_DATA_CONTAINER   = 'data'\n",
+							"PROCESSED_DATA_CONTAINER = 'processed-data'\n",
+							"\n",
+							"# Get the crawled data container client\n",
+							"crawled_data_container_client = blob_service_client.get_container_client(CRAWLED_DATA_CONTAINER)\n",
+							"\n",
+							"# Get or create the processed data container client\n",
+							"# Create the container\n",
+							"try:\n",
+							"    processed_data_container_client = blob_service_client.create_container(PROCESSED_DATA_CONTAINER)\n",
+							"except ResourceExistsError:\n",
+							"    print('Container data already exists')\n",
+							"    processed_data_container_client = blob_service_client.get_container_client(PROCESSED_DATA_CONTAINER)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"run_control": {
+								"frozen": false
+							},
+							"editable": true
+						},
+						"source": [
+							"\"\"\"\n",
+							"NOTE: I had two choices.\n",
+							"\n",
+							"1. Do all with Python and then have postgres load the resulting files\n",
+							"one for each DIM and FACT.\n",
+							"\n",
+							"2. Load the result of read_and_unfold_crawled_data into an SQL Staging table\n",
+							"and then make the DIM and FACT tables using SQL.\n",
+							"\n",
+							"Currently I will do the 1st and because 2nd is more scalable I'll do it in\n",
+							"the future\n",
+							"\"\"\"\n",
+							"def read_and_unfold_crawled_data():\n",
+							"    crawled_data_filenames = crawled_data_container_client.list_blob_names()\n",
+							"\n",
+							"    all_mantinades_df = None\n",
+							"\n",
+							"    for filename in crawled_data_filenames:\n",
+							"        if filename.endswith('.json'):\n",
+							"            continue\n",
+							"\n",
+							"        curr_df = get_df_from_container_blob(crawled_data_container_client, filename)\n",
+							"\n",
+							"        if all_mantinades_df is None:\n",
+							"            all_mantinades_df = curr_df\n",
+							"        else:\n",
+							"            all_mantinades_df = pd.concat([all_mantinades_df, curr_df], axis=0,\n",
+							"                                          ignore_index=True)\n",
+							"\n",
+							"    all_mantinades_df['topics'] = all_mantinades_df['topics'].apply(lambda x: ast.literal_eval(x))\n",
+							"    all_mantinades_df = all_mantinades_df.explode('topics', ignore_index=True)\n",
+							"\n",
+							"    # TODO: CHECK IN TOPICS THAT NOTHING IS NAN\n",
+							"    return all_mantinades_df\n",
+							"\n",
+							"\n",
+							"all_mantinades_df = read_and_unfold_crawled_data()\n",
+							"\n",
+							"print(all_mantinades_df)"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# NOTE: DO NOT FORGET THE UNKNOWN ROW IN ALL DIMS\n",
+							"def get_dim_topic_rows(mantinades_df):\n",
+							"    topics = list(mantinades_df['topics'].unique())\n",
+							"    topics = ['Άγνωστο'] + topics\n",
+							"    topics = list(enumerate(topics))\n",
+							"\n",
+							"    topic_to_id_map = {t: i for i, t in topics}\n",
+							"\n",
+							"    write_df_to_container_blob(pd.DataFrame(topics, columns=['Key', 'Name']), \n",
+							"                               processed_data_container_client,\n",
+							"                               'DIM_Topic.parquet')\n",
+							"\n",
+							"    return topic_to_id_map\n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"topic_to_id_map         = get_dim_topic_rows(all_mantinades_df)\n",
+							"print(topic_to_id_map)"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_dim_author_rows(mantinades_df):\n",
+							"    authors = list(mantinades_df['author'].unique())\n",
+							"    authors = ['Άγνωστο'] + authors\n",
+							"    authors = [a for a in authors if type(a) == str]\n",
+							"    authors = list(enumerate(authors))\n",
+							"\n",
+							"    author_to_id_map = {a: i for i, a in authors}\n",
+							"\n",
+							"    write_df_to_container_blob(pd.DataFrame(authors, columns=['Key', 'Name']), \n",
+							"                               processed_data_container_client,\n",
+							"                               'DIM_Author.parquet')\n",
+							"\n",
+							"    return author_to_id_map\n",
+							"\n",
+							"\n",
+							"\n",
+							"author_to_id_map        = get_dim_author_rows(all_mantinades_df)\n",
+							"print(author_to_id_map)"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_dim_mantinada_rows(mantinades_df):\n",
+							"    dim_mantinada_df = mantinades_df[['id', 'text']].drop_duplicates()\n",
+							"    dim_mantinada_df.columns = ['ID', 'Content']\n",
+							"\n",
+							"    dim_mantinada_df['Key'] = list(range(1, len(dim_mantinada_df) + 1))\n",
+							"\n",
+							"    dim_mantinada_df = dim_mantinada_df[['Key', 'ID', 'Content']]\n",
+							"\n",
+							"    mantinada_id_to_key_map = {r['ID']: r['Key'] for _, r in dim_mantinada_df.iterrows()}\n",
+							"\n",
+							"    write_df_to_container_blob(dim_mantinada_df, \n",
+							"                               processed_data_container_client,\n",
+							"                               'DIM_Mantinada.parquet')\n",
+							"\n",
+							"    return mantinada_id_to_key_map\n",
+							"\n",
+							"\n",
+							"mantinada_key_to_id_map = get_dim_mantinada_rows(all_mantinades_df)\n",
+							"print(mantinada_key_to_id_map)"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_dim_date_rows(mantinades_df):\n",
+							"    start_date = '01-01-1950'\n",
+							"    end_date = '01-01-2100'\n",
+							"\n",
+							"    date_range = pd.date_range(start_date, end_date, freq='D')\n",
+							"\n",
+							"    dim_date_data = {\n",
+							"        'Key':                  date_range.strftime('%Y%m%d').tolist(),\n",
+							"        'Date_Full':            date_range.strftime('%d/%m/%Y').tolist(),\n",
+							"        'Date_Full_US_Format':  date_range.strftime('%m/%d/%Y').tolist(),\n",
+							"        'Day':                  date_range.day.tolist(),\n",
+							"        'Day_Name':             date_range.day_name().tolist(),\n",
+							"        'Month':                date_range.month.tolist(),\n",
+							"        'Month_Name':           date_range.month_name().tolist(),\n",
+							"        'Year':                 date_range.year.tolist(),\n",
+							"        'Day_of_Year':          date_range.day_of_year.tolist(),\n",
+							"        'Day_of_Week':          date_range.day_of_week.tolist(),\n",
+							"        'Quarter':              date_range.quarter.tolist(),\n",
+							"        'Is_Month_Start':       date_range.is_month_start.tolist(),\n",
+							"        'Is_Month_End':         date_range.is_month_end.tolist(),\n",
+							"        'Is_Quarter_Start':     date_range.is_quarter_start.tolist(),\n",
+							"        'Is_Quarter_End':       date_range.is_quarter_end.tolist(),\n",
+							"        'Is_Year_Start':        date_range.is_year_start.tolist(),\n",
+							"        'Is_Year_End':          date_range.is_year_end.tolist(),\n",
+							"        'Is_Leap_Year':         date_range.is_leap_year.tolist()\n",
+							"    }\n",
+							"\n",
+							"    dim_date_data_df = pd.DataFrame(dim_date_data)\n",
+							"\n",
+							"    write_df_to_container_blob(dim_date_data_df, \n",
+							"                               processed_data_container_client,\n",
+							"                               'DIM_Date.parquet')\n",
+							"    return\n",
+							"\n",
+							"\n",
+							"get_dim_date_rows(all_mantinades_df)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"def get_fact_mantinada_entry_rows(mantinada_df, topic_to_id_map, author_to_id_map,\n",
+							"                                  mantinada_key_to_id_map):\n",
+							"    mantinada_entry_df = pd.DataFrame()\n",
+							"\n",
+							"    mantinada_entry_df['Key'] = list(range(1, len(mantinada_df) + 1))\n",
+							"    mantinada_entry_df['DIM_Topic_Key'] = mantinada_df['topics'].apply(lambda x: topic_to_id_map[x])\n",
+							"\n",
+							"    mantinada_df['author'] = mantinada_df['author'].apply(lambda x: x if type(x) == str else 'Άγνωστο')\n",
+							"    mantinada_entry_df['DIM_Author_Key'] = mantinada_df['author'].apply(lambda x: author_to_id_map[x])\n",
+							"\n",
+							"    mantinada_entry_df['DIM_Date_Key'] = mantinada_df['date'].apply(lambda x: ''.join(x.split('/')[::-1]))\n",
+							"    mantinada_entry_df['DIM_Mantinada_Key'] = mantinada_df['id'].apply(lambda x: mantinada_key_to_id_map[x])\n",
+							"\n",
+							"    write_df_to_container_blob(pd.DataFrame(mantinada_entry_df), \n",
+							"                               processed_data_container_client,\n",
+							"                               'FACT_Mantinada_Entry.parquet')\n",
+							"\n",
+							"    return\n",
+							"\n",
+							"get_fact_mantinada_entry_rows(all_mantinades_df, topic_to_id_map,\n",
+							"                              author_to_id_map, mantinada_key_to_id_map)\n",
+							"print(all_mantinades_df)"
+						],
+						"outputs": [],
+						"execution_count": 8
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SparkPoolManos')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 10,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.4",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "westeurope"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MantinadesETL Wrapper')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "MantinadesETL",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "MantinadesETL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Send Success Email",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "MantinadesETL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {},
+							"url": {
+								"value": "@pipeline().parameters.emailNotifierAppURL",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"message": "Run with ID @{pipeline().RunId} completed successfully.",
+								"dataFactoryName": "@{pipeline().DataFactory}",
+								"pipelineName": "@{pipeline().Pipeline}",
+								"receiver": "@{pipeline().parameters.receiver}"
+							}
+						}
+					},
+					{
+						"name": "Send Failure Email",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "MantinadesETL",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {},
+							"url": {
+								"value": "@pipeline().parameters.emailNotifierAppURL",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"value": "{\n    \"message\" : \"Run with ID @{pipeline().RunId} failed with the following errors, please check the pipeline run.\",\n    \"dataFactoryName\" : \"@{pipeline().DataFactory}\", \n    \"pipelineName\" : \"@{pipeline().Pipeline}\", \n    \"receiver\" : \"@{pipeline().parameters.receiver}\"\n}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"receiver": {
+						"type": "string",
+						"defaultValue": "manolislykos97@hotmail.gr"
+					},
+					"emailNotifierAppURL": {
+						"type": "string",
+						"defaultValue": "https://prod-231.westeurope.logic.azure.com:443/workflows/a92e72ae2aee4a74af93d0beb2d731e9/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=0kqILKN-X7EeRs-qRgbcc1X_yPWUh4DHkWq7we4w9ls"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/MantinadesETL')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		}
+	]
+}

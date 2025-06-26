@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "mantinades-crawler-workspace"
+		},
+		"Mantinades Crawling Function_functionKey": {
+			"value": ""
+		},
+		"MantinadesDW_connectionString": {
+			"value": ""
+		},
+		"mantinades-crawler-workspace-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:mantinades-crawler-workspace.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"mantinadescrawleraccount_connectionString": {
+			"value": ""
+		},
+		"Mantinades Crawling Function_properties_typeProperties_functionAppUrl": {
+			"value": "mantinades-scrapy-crawler.azurewebsites.net"
+		},
+		"mantinades-crawler-workspace-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://mantinadescrawleraccount.dfs.core.windows.net"
+		},
+		"Daily 8am Trigger_properties_MantinadesETL Wrapper_parameters_receiver": {
+			"value": "https://prod-231.westeurope.logic.azure.com:443/workflows/a92e72ae2aee4a74af93d0beb2d731e9/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=0kqILKN-X7EeRs-qRgbcc1X_yPWUh4DHkWq7we4w9ls"
+		},
+		"Daily 8am Trigger_properties_MantinadesETL Wrapper_parameters_emailNotifierAppURL": {
+			"value": "manolislykos97@hotmail.gr"
+		}
+	}
+}
