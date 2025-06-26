@@ -35,6 +35,7 @@ This means that we have a single Factless Fact Table with a granularity of a row
 1. Validates the JSON status file from the crawling step. If the file is invalid, the pipeline fails, to prevent loading incomplete or corrupt data.
 2. Processes the crawled raw data from the `data` container and converts it to Parquet files stored in the `processed_data` container, ready for loading into the Data Warehouse.
 3. The existing database is truncated and repopulated with the latest data from the `processed_data` container.
+4. Whether the pipeline succeeded or failed we notify via e-mail the user.
 
 The crawling and ETL processes are orchestrated to run weekly, with scraping scheduled three hours before the ETL job to ensure timely data availability.
 
