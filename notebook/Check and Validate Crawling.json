@@ -18,15 +18,16 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "6716988b-4aa2-4e03-bdc7-b274c98afbc7"
+				"spark.autotune.trackingId": "c65165ea-4d8a-4816-85a7-4a621a5c72b4"
 			}
 		},
 		"metadata": {
 			"saveOutput": true,
-			"synapse_widget": {
-				"version": "0.1"
-			},
 			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
 			"language_info": {
 				"name": "python"
 			},
@@ -37,14 +38,13 @@
 				"endpoint": "https://mantinades-crawler-workspace.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPoolManos",
 				"auth": {
 					"type": "AAD",
-					"authResource": "https://dev.azuresynapse.net",
-					"authHeader": null
+					"authResource": "https://dev.azuresynapse.net"
 				},
 				"sparkVersion": "3.4",
 				"nodeCount": 10,
 				"cores": 4,
 				"memory": 28,
-				"extraHeader": null
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -118,6 +118,16 @@
 					"    raise Exception(error_msg)"
 				],
 				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"if crawling_info['all_topics_num'] == 0:\n",
+					"    error_msg = f'Crawling did not parsed any topic which is impossible and probably because of absense of proxy tokens.'\n",
+					"    print(error_msg)\n",
+					"    raise Exception(error_msg)"
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
